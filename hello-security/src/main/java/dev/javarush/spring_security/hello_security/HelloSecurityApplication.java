@@ -1,13 +1,13 @@
-package dev.javarush.spring_security_course.hello_spring_security;
+package dev.javarush.spring_security.hello_security;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class HelloSpringSecurityApplication {
+public class HelloSecurityApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(HelloSpringSecurityApplication.class, args);
+		SpringApplication.run(HelloSecurityApplication.class, args);
 	}
 
 }

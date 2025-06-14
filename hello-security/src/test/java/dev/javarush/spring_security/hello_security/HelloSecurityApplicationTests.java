@@ -1,10 +1,10 @@
-package dev.javarush.spring_security_course.hello_spring_security;
+package dev.javarush.spring_security.hello_security;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class HelloSpringSecurityApplicationTests {
+class HelloSecurityApplicationTests {
 
 	@Test
 	void contextLoads() {
