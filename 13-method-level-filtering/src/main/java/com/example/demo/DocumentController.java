@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import java.util.Collection;
+import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,7 +19,8 @@ public class DocumentController {
   }
 
   @PostMapping
-  Collection<Document> updateDocuments(@RequestBody Collection<Document> documents) {
+  Collection<Document> updateDocuments(@RequestBody List<Document> documents) {
+    List<Document> docs = List.of(documents.get(0), documents.get(1), documents.get(2));
     var result = this.service.updateDocuments(documents);
     System.out.println("--------- Documents ------------------");
     documents.forEach(System.out::println);
