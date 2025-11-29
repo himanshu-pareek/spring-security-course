@@ -1,0 +1,22 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CsrfApplication",
+            "request": "launch",
+            "mainClass": "dev.javarush.spring_security_course.csrf.CsrfApplication",
+            "projectName": "11-csrf-server"
+        },
+        {
+            "type": "java",
+            "name": "ClientApplication",
+            "request": "launch",
+            "mainClass": "com.example.client.ClientApplication",
+            "projectName": "client"
+        }
+    ]
+}

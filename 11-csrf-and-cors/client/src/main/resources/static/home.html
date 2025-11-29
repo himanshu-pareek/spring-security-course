@@ -1,0 +1,45 @@
+<html>
+  <head>
+    <title>Home</title>
+  </head>
+  <body>
+    <h1>Client</h1>
+    <form action="http://localhost:8080/transfer" method="post">
+      <input type="hidden" name="amount" value="2000" /><br />
+      <input type="hidden" name="to" value="scammer" /><br />
+      <button type="submit">Win Money</button>
+    </form>
+
+    <br />
+    <br />
+
+    <button id="btn-get">Get</button><br /><br />
+    <button id="btn-post">Post</button>
+
+    <script>
+      document.getElementById("btn-get").onclick = (e) => {
+        fetch("http://localhost:8080/hello")
+          .then((s) => s.text())
+          .then((s) => window.alert(s))
+          .catch(console.log);
+      };
+      document.getElementById("btn-post").onclick = (e) => {
+        fetch(
+          "http://localhost:8080/transfer",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              Authorization: "Basic " + btoa("user:password"),
+            },
+            body: new URLSearchParams({ amount: "20", to: "alice" }),
+          },
+          {}
+        )
+          .then((s) => s.text())
+          .then((s) => window.alert(s))
+          .catch(console.log);
+      };
+    </script>
+  </body>
+</html>

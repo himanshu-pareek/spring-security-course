@@ -1,0 +1,45 @@
+<html>
+  <head>
+    <title>Home</title>
+  </head>
+  <body>
+    <h3>Server 🏠</h3>
+    <form action="/transfer" method="post">
+      Amount - <input type="text" name="amount" /><br />
+      To - <input type="text" name="to" /><br />
+      <!-- <input
+        type="hidden"
+        th:name="${_csrf.parameterName}"
+        th:value="${_csrf.token}"
+      /> -->
+      <button type="submit">Transfer</button>
+    </form>
+
+    <br />
+    <br />
+
+    <button id="btn-get">Get</button><br /><br />
+    <button id="btn-post">Post</button>
+
+    <script>
+      document.getElementById("btn-get").onclick = (e) => {
+        fetch("/hello")
+          .then((s) => s.text())
+          .then((s) => window.alert(s))
+          .catch(console.log);
+      };
+      document.getElementById("btn-post").onclick = (e) => {
+        fetch("/transfer", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({ amount: "20", to: "alice" }),
+        })
+          .then((s) => s.text())
+          .then((s) => window.alert(s))
+          .catch(console.log);
+      };
+    </script>
+  </body>
+</html>
