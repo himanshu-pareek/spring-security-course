@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: OAuth2 Authorization Server
+#  security:
+#    user:
+#      name: user
+#      password: password
+#    oauth2:
+#      authorizationserver:
+#        client:
+#          oidc-client:
+#            registration:
+#              client-id: "oidc-client"
+#              client-secret: "{noop}secret"
+#              client-authentication-methods:
+#                - "client_secret_basic"
+#              authorization-grant-types:
+#                - "authorization_code"
+#                - "refresh_token"
+#              redirect-uris:
+#                - "https://example.net/authorized"
+#              post-logout-redirect-uris:
+#                - "http://127.0.0.1:8080/"
+#              scopes:
+#                - "openid"
+#                - "profile"
+#            require-authorization-consent: true
+
+logging:
+  level:
+    org.springframework.security: trace
+
