@@ -23,7 +23,7 @@ public class AuthorizationCodeGrantFlow {
   private static final String redirectUri = "https://example.net/authorized";
 
   private static final String responseType = "code";
-  private static final String scope = "openid books.read";
+  private static final String scope = "books.list books.read";
   private static final String grantType = "authorization_code";
 
   public static void main(String[] args) {

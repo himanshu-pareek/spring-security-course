@@ -20,7 +20,7 @@ public class ClientCredentialsGrantFlow {
   private static final String clientId = "oidc-client";
   private static final String clientSecret = "secret";
 
-  private static final String scope = "books.read";
+  private static final String scope = "books.list books.edit";
   private static final String grantType = "client_credentials";
 
   public static void main(String[] args) {

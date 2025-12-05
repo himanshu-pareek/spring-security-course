@@ -1,0 +1,3 @@
+curl localhost:8081/books \
+    -H "Authorization: Bearer DM_LbpgVyg-HJ1aIl6BTeFtYJElqGsw2O0ObdvhklNvWaoX5GED9tZGB-mqTWjOd6KZSLf0iOawjwbQn5117w1pKRZxXeaAt9kYPXKjPh6ZnBHmxlXd2CZq2Yx3sVI9F" \
+    -v -X POST

@@ -9,7 +9,11 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.time.Duration;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -17,13 +21,17 @@ import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
@@ -31,6 +39,9 @@ import org.springframework.security.oauth2.server.authorization.settings.Authori
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
+import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenClaimsContext;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
@@ -91,6 +102,14 @@ public class SecurityConfig {
 
     @Bean
 	public RegisteredClientRepository registeredClientRepository() {
+
+        RegisteredClient resourceServer = RegisteredClient.withId(UUID.randomUUID().toString())
+            // other minimal configuration
+            .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+            .clientId("resource-client")
+            .clientSecret("{noop}res-secret")
+            .build();
 		RegisteredClient oidcClient = RegisteredClient.withId(UUID.randomUUID().toString())
 				.clientId("oidc-client")
 				.clientSecret("{noop}secret")
@@ -102,17 +121,24 @@ public class SecurityConfig {
 				.postLogoutRedirectUri("https://example.net")
 				.scope(OidcScopes.OPENID)
 				.scope(OidcScopes.PROFILE)
-            .scope("books.read")
+                .scope("books.read")
+                .scope("books.edit")
+                .scope("books.list")
 				.clientSettings(
                     ClientSettings
                         .builder()
                         .requireAuthorizationConsent(true)
                         .build()
                 )
-            .tokenSettings(TokenSettings.builder().accessTokenFormat(OAuth2TokenFormat.REFERENCE).build())
+            .tokenSettings(
+                TokenSettings
+                    .builder()
+                    .accessTokenFormat(OAuth2TokenFormat.REFERENCE)
+                    .accessTokenTimeToLive(Duration.ofHours(1))
+                    .build())
 				.build();
 
-		return new InMemoryRegisteredClientRepository(oidcClient);
+		return new InMemoryRegisteredClientRepository(oidcClient, resourceServer);
 	}
 
     @Bean
@@ -151,4 +177,42 @@ public class SecurityConfig {
 		return AuthorizationServerSettings.builder()
             .build();
 	}
+
+    // JWT Customization
+  @Bean
+  OAuth2TokenCustomizer<JwtEncodingContext> jwtAccessTokenCustomizer() {
+    return context -> {
+      JwtClaimsSet.Builder claims = context.getClaims();
+      if (context.getTokenType().equals(OAuth2TokenType.ACCESS_TOKEN)) {
+          // If the token type is access token
+          Authentication authentication = context.getPrincipal();
+          // Do something based on authentication
+          // Like, get all roles and put in `roles` claim
+          claims.claim("roles", authentication.getAuthorities()
+              .stream()
+              .map(GrantedAuthority::getAuthority)
+              .filter(Objects::nonNull)
+              .filter(a -> a.startsWith("ROLE_"))
+              .map(a -> a.substring(5))
+              .collect(Collectors.toSet())
+          );
+      }
+    };
+  }
+
+  @Bean
+OAuth2TokenCustomizer<OAuth2TokenClaimsContext> opaqueTokenCustomizer() {
+  return new OAuth2TokenCustomizer<OAuth2TokenClaimsContext>() {
+    @Override
+    public void customize(OAuth2TokenClaimsContext context) {
+      List<String> roles = context.getPrincipal().getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .filter(Objects::nonNull)
+            .filter(a -> a.startsWith("ROLE_"))
+            .map(a -> a.substring(5))
+            .toList();
+        context.getClaims().claim("roles", roles);
+    }
+  };
+}
 }
